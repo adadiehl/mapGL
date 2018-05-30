@@ -38,7 +38,7 @@ Based on bnMapper.py, by Ogert Denas (James Taylor lab):
   | __-t FLOAT, --threshold FLOAT__ | Mapping threshold i.e., |elem| * threshold <= |mapped_elem| (default: 0.0) |
   | __-g GAP, --gap GAP__ | Ignore elements with an insertion/deletion of this or bigger size. (default: -1) |
   | __-v {info,debug,silent}, --verbose {info,debug,silent}__ | Verbosity level (default: info) |
-  | __-d, --drop_split__ | Follow the bnMapper convention of silently dropping elements that span multiple chains, rather than the liftOver mapping convention for split alignments: keep elements that span multiple chains and reporting the longest aligned segment. This is not recommended, as it may lead to spurious gain/loss predictions for orthologous elements that happen to be split across chains due to chromosomal rearrangements, etc... (default: False) |
+  | __-d, --drop_split__ | Follow the bnMapper convention of silently dropping elements that span multiple chains, rather than the liftOver mapping convention for split alignments: keep elements that span multiple chains and report the longest aligned segment. This is not recommended, as it may lead to spurious gain/loss predictions for orthologous elements that happen to be split across chains due to chromosomal rearrangements, etc... (default: False) |
 
 ## Output
 
