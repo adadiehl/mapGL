@@ -22,23 +22,11 @@ Based on bnMapper.py, by Ogert Denas (James Taylor lab):
 
 ## Required Arguments
 
-  * input                 Input regions to process. Should be in standard bed
-                          format. Only the first four bed fields will be used.
-  * tree                  Tree, in standard Newick format, with or without
-                          branch lengths, describing relationships of query and
-                          target species to outgroups.
-  * qname                 Name of the query species. Regions from this species
-                          will be mapped to target species coordinates.
-  * tname                 Name of the target species. Regions from the query
-                          species will be mapped to coordinates from this
-                          species.
-  * alignments            Alignment files (.chain or .pkl): One for the target
-                          species and one per outgroup species. Files should be
-                          named according to the convention:
-                          qname.tname[...].chain.gz, where qname is the query
-                          species name and tname is the name of the
-                          target/outgroup species. Names used for qname and
-                          tname must match names used in the newick tree.
+  | input | Input regions to process. Should be in standard bed format. Only the first four bed fields will be used. |
+  | tree | Phylogenetic tree describing relationships of query and target species to outgroups. Must be in standard Newick format. Branch lengths are optional, and will be ignored. |
+  | qname | Name of the query species. Regions from this species will be mapped to target species coordinates. |
+  | tname | Name of the target species. Regions from the query species will be mapped to coordinates from this species. |
+  | alignments | Alignment files (.chain or .pkl): One for the target species and one per outgroup species. Files should be named according to the convention: qname.tname[...].chain.gz, where qname is the query species name and tname is the name of the target/outgroup species. Names used for qname and tname must match names used in the newick tree. |
 
 ## Options
 
