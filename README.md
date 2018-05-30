@@ -18,9 +18,7 @@ Based on bnMapper.py, by Ogert Denas (James Taylor lab):
 
 ## Usage
 
-```mapGL.py [-h] [-o FILE] [-t FLOAT] [-g GAP] [-v {info,debug,silent}]
-                [-k]
-                input tree qname tname alignments [alignments ...] ```
+```mapGL.py [-h] [-o FILE] [-t FLOAT] [-g GAP] [-v {info,debug,silent}] [-k] input tree qname tname alignments [alignments ...] ```
 
 ## Required Arguments
 
