@@ -1,5 +1,5 @@
 # mapGL
-## Cross-species mapping of DNA elements combined with gain/loss prediction for non-mapping features based on a phylogenetic maximum parsimony algorithm.
+#### Cross-species mapping of DNA elements combined with gain/loss prediction for non-mapping features based on a phylogenetic maximum parsimony algorithm.
 
 Label input regions as orthologous, gained in the query species, or lost in
 the target species. Chain alignment files are used to map features from query
