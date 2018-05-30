@@ -2,14 +2,14 @@
 #### Cross-species mapping of DNA elements combined with gain/loss prediction for non-mapping features based on a phylogenetic maximum parsimony algorithm.
 
 Label input regions as orthologous, gained in the query species, or lost in
-the target species. Chain alignment files are used to map features from query
-to target and one or more outgroup species. Features that map directly from
+the target species, based on inferred presence/absence in the most-recent
+common ancestor (MRCA). Chained alignment files are used to map features from
+query to target and one or more outgroup species. Features that map directly from
 query to target are labeled as orthologs, and ortholgous coordinates in the
 target species are given in the output. Non-mapping features are assigned as
-gains or losses based on a maximum-parsimony algorithm predicting
-presence/absence in the most-recent common ancestor. Features that, when
-mapped, span multiple chains or multiple chromosomes are silently filtered out
-unless the -k argument is given.
+gains or losses based on a maximum-parsimony algorithm predicting presence
+or absence in the MRCA. Features that, when mapped, span multiple chains or
+multiple chromosomes are silently filtered out unless the -k argument is given.
 
 Based on bnMapper.py, by Ogert Denas (James Taylor lab):
   * https://github.com/bxlab/bx-python/blob/master/scripts/bnMapper.py
@@ -28,7 +28,7 @@ Based on bnMapper.py, by Ogert Denas (James Taylor lab):
   | tree | Phylogenetic tree describing relationships of query and target species to outgroups. Must be in standard Newick format. Branch lengths are optional, and will be ignored. |
   | qname | Name of the query species. Regions from this species will be mapped to target species coordinates. |
   | tname | Name of the target species. Regions from the query species will be mapped to coordinates from this species. |
-  | alignments | Alignment files (.chain or .pkl): One for the target species and one per outgroup species. Files should be named according to the convention: qname.tname[...].chain.gz, where qname is the query species name and tname is the name of the target/outgroup species. Names used for qname and tname must match names used in the newick tree. |
+  | alignments | Alignment files (.chain or .pkl): One for the target species and one per outgroup species. Files should be named according to the convention: qname.tname[...].chain.gz, where qname is the query species name and tname is the name of the target/outgroup species. Names used for qname and tname must match names used in the phylogenetic tree. |
 
 ## Options
 
