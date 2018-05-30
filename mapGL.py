@@ -7,8 +7,7 @@ to target and one or more outgroup species. Features that map directly from quer
 to target are labeled as orthologs, and ortholgous coordinates in the target 
 species are given in the output. Non-mapping features are assigned as gains or
 losses based on a maximum-parsimony algorithm predicting presence/absence in the 
-most-recent common ancestor. Features that, when mapped, span multiple chains or
-multiple chromosomes are silently filtered out unless the -k argument is given.
+most-recent common ancestor.
 
 Based on bnMapper.py, by Ogert Denas (James Taylor lab)
 (https://github.com/bxlab/bx-python/blob/master/scripts/bnMapper.py)
@@ -137,7 +136,7 @@ def transform_by_chrom(all_epo, from_elem, tree, chrom, opt):
     if len(to_elem_slices) == 0:
         log.debug("%s: no match in target: discarding." % (str(from_elem)))
         return elems_mapped
-    elif len(to_elem_slices) > 1 and opt.keep_split:
+    elif len(to_elem_slices) > 1:
         log.debug("%s spans multiple chains/chromosomes. Using longest alignment." % (str(from_elem)))
         max_elem_len = 0
         for i in xrange(len(to_elem_slices)):
@@ -145,7 +144,7 @@ def transform_by_chrom(all_epo, from_elem, tree, chrom, opt):
             if elem_len > max_elem_len:
                 max_elem_len = elem_len
                 max_elem_idx = i
-    elif len(to_elem_slices) > 1:
+    elif len(to_elem_slices) > 1 and opt.drop_split:
         log.debug("%s spans multiple chains/chromosomes: discarding." % (str(from_elem)))
     to_elem_slices = to_elem_slices[max_elem_idx]
 
@@ -326,8 +325,8 @@ if __name__ == "__main__":
             help="Ignore elements with an insertion/deletion of this or bigger size.")
     parser.add_argument('-v', '--verbose', type=str, choices=list(LOG_LEVELS.keys()), default='info',
             help='Verbosity level')
-    parser.add_argument("-k", '--keep_split', default=False, action='store_true',
-            help="If elements span multiple chains, report the segment with the longest overlap instead of silently dropping them. (This is the default behavior for liftOver.)")
+    parser.add_argument("-d", '--drop_split', default=False, action='store_true',
+                        help="If elements span multiple chains, report them as non-mapping. These will then be reported as gains or losses, according to the maximum-parsimony predictions. This is the default mapping behavior for bnMapper. By default, mapGL.pys will follow the mapping convention used by liftOver, whereas the longest mapped alignment is reported for split elements.")
 
 
     opt = parser.parse_args()
