@@ -1,5 +1,5 @@
 # mapGL
-##Cross-species mapping of DNA elements combined with gain/loss prediction for non-mapping features based on a phylogenetic maximum parsimony algorithm.
+## Cross-species mapping of DNA elements combined with gain/loss prediction for non-mapping features based on a phylogenetic maximum parsimony algorithm.
 
 Label input regions as orthologous, gained in the query species, or lost in
 the target species. Chain alignment files are used to map features from query
@@ -20,9 +20,10 @@ Based on bnMapper.py, by Ogert Denas (James Taylor lab):
 
 ```mapGL.py [-h] [-o FILE] [-t FLOAT] [-g GAP] [-v {info,debug,silent}]
                 [-k]
-                input tree qname tname alignments [alignments ...]```
+                input tree qname tname alignments [alignments ...] ```
 
 ## Required Arguments
+
   * input                 Input regions to process. Should be in standard bed
                           format. Only the first four bed fields will be used.
   * tree                  Tree, in standard Newick format, with or without
@@ -42,19 +43,20 @@ Based on bnMapper.py, by Ogert Denas (James Taylor lab):
                           tname must match names used in the newick tree.
 
 ## Options
-  -h, --help            show this help message and exit
-  -o FILE, --output FILE
-                        Output file. Default stdout. (default: stdout)
-  -t FLOAT, --threshold FLOAT
-                        Mapping threshold i.e., |elem| * threshold <=
-                        |mapped_elem| (default: 0.0)
-  -g GAP, --gap GAP     Ignore elements with an insertion/deletion of this or
-                        bigger size. (default: -1)
-  -v {info,debug,silent}, --verbose {info,debug,silent}
-                        Verbosity level (default: info)
-  -k, --keep_split      If elements span multiple chains, report the segment
-                        with the longest overlap instead of silently dropping
-                        them. (This is the default behavior for liftOver.)
-                        (default: False)
+
+  * -h, --help            show this help message and exit
+  * -o FILE, --output FILE
+                          Output file. Default stdout. (default: stdout)
+  * -t FLOAT, --threshold FLOAT
+                          Mapping threshold i.e., |elem| * threshold <=
+                          |mapped_elem| (default: 0.0)
+  * -g GAP, --gap GAP     Ignore elements with an insertion/deletion of this or
+                          bigger size. (default: -1)
+  * -v {info,debug,silent}, --verbose {info,debug,silent}
+                          Verbosity level (default: info)
+  * -k, --keep_split      If elements span multiple chains, report the segment
+                          with the longest overlap instead of silently dropping
+                          them. (This is the default behavior for liftOver.)
+                          (default: False)
 
 Copyright 2018, Adam Diehl (adadiehl@umich.edu), Boyle Lab, University of Michigan
