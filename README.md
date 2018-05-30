@@ -22,6 +22,8 @@ Based on bnMapper.py, by Ogert Denas (James Taylor lab):
 
 ## Required Arguments
 
+  | Argument | Description |
+  |---|---|
   | input | Input regions to process. Should be in standard bed format. Only the first four bed fields will be used. |
   | tree | Phylogenetic tree describing relationships of query and target species to outgroups. Must be in standard Newick format. Branch lengths are optional, and will be ignored. |
   | qname | Name of the query species. Regions from this species will be mapped to target species coordinates. |
