@@ -32,19 +32,28 @@ Based on bnMapper.py, by Ogert Denas (James Taylor lab):
 
 ## Options
 
-  * -h, --help            show this help message and exit
-  * -o FILE, --output FILE
-                          Output file. Default stdout. (default: stdout)
-  * -t FLOAT, --threshold FLOAT
-                          Mapping threshold i.e., |elem| * threshold <=
-                          |mapped_elem| (default: 0.0)
-  * -g GAP, --gap GAP     Ignore elements with an insertion/deletion of this or
-                          bigger size. (default: -1)
-  * -v {info,debug,silent}, --verbose {info,debug,silent}
-                          Verbosity level (default: info)
-  * -k, --keep_split      If elements span multiple chains, report the segment
-                          with the longest overlap instead of silently dropping
-                          them. (This is the default behavior for liftOver.)
-                          (default: False)
+  | Option | Description |
+  |---|---|
+  | -h, --help | Show help message and exit. |
+  | -o FILE, --output FILE | Output file. (default: stdout) |
+  | -t FLOAT, --threshold FLOAT | Mapping threshold i.e., |elem| * threshold <= |mapped_elem| (default: 0.0) |
+  | -g GAP, --gap GAP | Ignore elements with an insertion/deletion of this or bigger size. (default: -1) |
+  | -v {info,debug,silent}, --verbose {info,debug,silent} | Verbosity level (default: info) |
+  | -k, --keep_split | Use liftOver mapping convention for split alignments: eep elements that span multiple chains, reporting the longest aligned segment, instead of silently dropping them. (default: False) |
+
+## Output
+
+Predictions are reported in tab-delimited format with the first four columns following the BED4 convention. The predicted evolutionary history (i.e., ortholog, gain in query, or loss in target) is reported in the "status" column. The final three columns contain the mapped location, in target coordinates, of mapped (ortholog) elements.
+
+| Column | Description |
+|---|---|
+| chrom | Chromosome on which the query element is located. |
+| start | Start position on query chromosome. |
+| end | End position on query chromosome. |
+| name | Element name or ID. |
+| status | Predicted phylogenetic history: __ortholog__, __gain_qname__, or __loss_tname__ |
+| mapped chrom | For mapped (ortholog) elements, the chromosome on which the mapped element is located, in target coordinates. |
+| mapped start | For mapped (ortholog) elements, the start position on the target chromosome on which the mapped element is located. |
+| mapped end | For mapped (ortholog) elements, the end position on the target chromosome on which the mapped element is located. |
 
 Copyright 2018, Adam Diehl (adadiehl@umich.edu), Boyle Lab, University of Michigan
