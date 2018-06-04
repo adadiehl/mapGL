@@ -28,6 +28,9 @@ from bx.cookbook import argparse
 from bx.intervals.intersection import IntervalTree, Interval
 
 elem_t = np.dtype([('chrom', np.str_, 30), ('start', np.int64), ('end', np.int64), ('id', np.str_, 100)])
+narrowPeak_t = np.dtype([('chrom', np.str_, 30), ('start', np.int64), ('end', np.int64), ('id', np.str_, 100),
+                         ('score', np.int64), ('strand', np.str_, 1), ('signalValue', np.float),
+                         ('pValue', np.float), ('qValue', np.float), ('peak', np.int64)])
 LOG_LEVELS = {"info" : logging.INFO, "debug" : logging.DEBUG, "silent" : logging.ERROR}
 
 logging.basicConfig()
@@ -161,7 +164,18 @@ def transform_by_chrom(all_epo, from_elem, tree, chrom, opt):
         # start, and end of the mapped region as a whole.
         start = to_elem_list[0][1]
         end = to_elem_list[-1][2]
-        elems_mapped.append([to_elem_list[0][0], start, end, from_elem['id']])
+        peak = int((start + end)/2) - start
+        if opt.in_format == "narrowPeak":
+            # Map the peak location
+            matching_block_ids = [attrgetter("value")(_) for _ in tree.find(chrom, from_elem['peak'], from_elem['peak'])]
+            p_elem_slices = [_ for _ in (transform( np.array((chrom, from_elem['peak'], from_elem['peak'], '.'), dtype=elem_t), all_epo[i], opt.gap) for i in matching_block_ids) if _]
+            if len(p_elem_slices) >= 1:
+                #sys.stderr.write("{}\n".format(p_elem_slices))
+                # Make sure the peak is between the start and end positions
+                if p_elem_slices[0][0][1] >= start and p_elem_slices[0][0][1] <= end:
+                    peak = p_elem_slices[0][0][1] - start
+                    
+        elems_mapped.append([to_elem_list[0][0], start, end, peak, from_elem['id']])
     return elems_mapped
 
 def transform_file(ELEMS, ofname, TREES, leaves, phylo_full, phylo_pruned, opt):
@@ -181,21 +195,25 @@ def transform_file(ELEMS, ofname, TREES, leaves, phylo_full, phylo_pruned, opt):
     which normally results in an unambigous call. If this still does not
     work, the "ambiguous" label will be applied.
     """
-    OUT_FRM = "%s\t%d\t%d\t%s\t%s\t%s\t%d\t%d\n"
+    OUT_FRM = "%s\t%d\t%d\t%s\t%d\t%s\t%s\t%d\t%d\t%d\n"
 
 
     log.info("Mapping {} features...".format(len(ELEMS.flat)))
     with open(ofname, 'w') as out_fd:
 
         for elem in ELEMS.flat:
+            peak = int((elem[2] - elem[1])/2)
+            if opt.in_format == "narrowPeak":
+                peak =  elem[9] - elem[1]
+            
             # First try mapping to the target species.
             mapped_el = map_elem(elem, TREES[opt.tname]["EPO"],
                                  TREES[opt.tname]["TREE"], opt)
 
             if mapped_el:
                 #sys.stderr.write("{}\n".format(mapped_el))
-                out_fd.write(OUT_FRM % (elem[0], elem[1], elem[2], elem[3],
-                                        "ortholog", mapped_el[0], mapped_el[1], mapped_el[2]))
+                out_fd.write(OUT_FRM % (elem[0], elem[1], elem[2], elem[3], peak,
+                                        "ortholog", mapped_el[0], mapped_el[1], mapped_el[2], mapped_el[3]))
             
             else:
                 # No match to target. Map to outgroups.
@@ -231,8 +249,8 @@ def transform_file(ELEMS, ofname, TREES, leaves, phylo_full, phylo_pruned, opt):
                     elif in_mrca == 1:
                         orth_str = "loss_{}".format(opt.tname)
 
-                out_fd.write(OUT_FRM % (elem[0], elem[1], elem[2], elem[3],
-                                        orth_str, ".", -1, -1))            
+                out_fd.write(OUT_FRM % (elem[0], elem[1], elem[2], elem[3], peak,
+                                        orth_str, ".", -1, -1, -1))
     log.info("DONE!")
 
 
@@ -302,6 +320,31 @@ def loadFeatures(path):
             data.append( (cols[0], int(cols[1]), int(cols[2]), cols[3]) )
     return np.array(data, dtype=elem_t)
 
+def loadFeatures(path, opt):
+    """
+    Load features. For BED, only BED4 columns are loaded.
+    For narrowPeak, all columns are loaded.
+    """
+
+    log.info("loading from %s ..." % path)
+    data = []
+    if opt.in_format == "BED":
+        with open(path) as fd:
+            for line in fd:
+                cols = line.split()
+                data.append( (cols[0], int(cols[1]), int(cols[2]), cols[3]) )
+        data = np.array(data, dtype=elem_t)
+    else:
+        with open(path) as fd:
+            for line in fd:
+		cols = line.split()
+                data.append( (cols[0], int(cols[1]), int(cols[2]), cols[3], int(cols[4]),
+                              cols[5], float(cols[6]), float(cols[7]), float(cols[8]),
+                              int(cols[-1])+int(cols[1])) )
+        data = np.array(data, dtype=narrowPeak_t)
+    return data
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__, epilog="Adam Diehl (Boyle Lab)",
             formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -326,8 +369,9 @@ if __name__ == "__main__":
     parser.add_argument('-v', '--verbose', type=str, choices=list(LOG_LEVELS.keys()), default='info',
             help='Verbosity level')
     parser.add_argument("-d", '--drop_split', default=False, action='store_true',
-                        help="If elements span multiple chains, report them as non-mapping. These will then be reported as gains or losses, according to the maximum-parsimony predictions. This is the default mapping behavior for bnMapper. By default, mapGL.pys will follow the mapping convention used by liftOver, whereas the longest mapped alignment is reported for split elements.")
-
+            help="If elements span multiple chains, report them as non-mapping. These will then be reported as gains or losses, according to the maximum-parsimony predictions. This is the default mapping behavior for bnMapper. By default, mapGL.pys will follow the mapping convention used by liftOver, whereas the longest mapped alignment is reported for split elements.")
+    parser.add_argument("-i", "--in_format", choices=["BED", "narrowPeak"], default="BED",
+            help="Input file format.")
 
     opt = parser.parse_args()
     log.setLevel(LOG_LEVELS[opt.verbose])
@@ -392,4 +436,4 @@ if __name__ == "__main__":
         exit(1)
 
     # transform elements
-    transform_file(loadFeatures( opt.input ), opt.output, TREES, leaves, phylo_full, phylo_pruned, opt)
+    transform_file(loadFeatures( opt.input, opt ), opt.output, TREES, leaves, phylo_full, phylo_pruned, opt)

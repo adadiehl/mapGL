@@ -39,6 +39,7 @@ Based on bnMapper.py, by Ogert Denas (James Taylor lab):
   | __-g GAP, --gap GAP__ | Ignore elements with an insertion/deletion of this or bigger size. (default: -1) |
   | __-v {info,debug,silent}, --verbose {info,debug,silent}__ | Verbosity level (default: info) |
   | __-d, --drop_split__ | Follow the bnMapper convention of silently dropping elements that span multiple chains, rather than the liftOver mapping convention for split alignments: keep elements that span multiple chains and report the longest aligned segment. This is not recommended, as it may lead to spurious gain/loss predictions for orthologous elements that happen to be split across chains due to chromosomal rearrangements, etc... (default: False) |
+  | __-i {BED,narrowPeak}, --in_format__ {BED,narrowPeak} | Input file format. (default: BED) |
 
 ## Output
 
@@ -50,9 +51,11 @@ Predictions are reported in tab-delimited format with the first four columns fol
 | __start__ | Start position on query chromosome. |
 | __end__ | End position on query chromosome. |
 | __name__ | Element name or ID. |
+| __peak__ | Peak location (narrowPeak input) or element midpoint (BED input) |
 | __status__ | Predicted phylogenetic history: __ortholog__, __gain_qname__, or __loss_tname__ |
 | __mapped chrom__ | For mapped (ortholog) elements, the chromosome on which the mapped element is located, in target coordinates. |
 | __mapped start__ | For mapped (ortholog) elements, the start position on the target chromosome on which the mapped element is located. |
 | __mapped end__ | For mapped (ortholog) elements, the end position on the target chromosome on which the mapped element is located. |
+| __mapped_peak__ | For mapped (ortholog) elements, the mapped peak position (narrowPeak input) or mapped element midpoint (BED input). |
 
 Copyright 2018, Adam Diehl (adadiehl@umich.edu), Boyle Lab, University of Michigan
