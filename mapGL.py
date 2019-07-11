@@ -340,7 +340,7 @@ def loadFeatures(path, opt):
     else:
         with open(path) as fd:
             for line in fd:
-		cols = line.split()
+                cols = line.split()
                 data.append( (cols[0], int(cols[1]), int(cols[2]), cols[3], int(cols[4]),
                               cols[5], float(cols[6]), float(cols[7]), float(cols[8]),
                               int(cols[-1])+int(cols[1])) )
