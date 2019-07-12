@@ -4,4 +4,4 @@ regions on a line in general) efficiently.
 """
 
 # For compatiblity with existing stuff
-from bx.intervals.intersection import *
+from lib.bx.intervals.intersection import *

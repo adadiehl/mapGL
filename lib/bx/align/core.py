@@ -7,7 +7,7 @@ import weakref
 
 import six
 
-from bx.misc.readlengths import read_lengths_file
+from lib.bx.misc.readlengths import read_lengths_file
 
 # DNA reverse complement table
 ## DNA_COMP = "                                             -                  " \
