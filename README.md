@@ -1,7 +1,7 @@
 # mapGL
-#### Cross-species mapping of DNA elements combined with gain/loss prediction for non-mapping features based on a phylogenetic maximum parsimony algorithm.
+## Prediction of lineage-specific gain and loss of genomic sequence elements based on phylogenetic maximum parsimony.
 
-Label input regions as orthologous, gained in the query species, or lost in
+Label genomic regions as orthologous, gained in the query species, or lost in
 the target species, based on inferred presence/absence in the most-recent
 common ancestor (MRCA). Chained alignment files are used to map features from
 query to target and one or more outgroup species. Features that map directly from
@@ -14,6 +14,10 @@ Based on bnMapper.py, by Ogert Denas (James Taylor lab):
   * https://github.com/bxlab/bx-python/blob/master/scripts/bnMapper.py
   * https://travis-ci.org/bxlab/bx-python
 
+## Dependencies
+numpy
+Cython
+six
 
 ## Usage
 
