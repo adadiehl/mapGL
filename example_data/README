@@ -1,0 +1,9 @@
+# To process example data, us the following command:
+../mapGL.py example.hg19.narrowPeak "(((hg19:1,mm9:3):2,(canFam2:4,equCab2:5):6):90,loxAfr3:7)" hg19 mm9 hg19.mm9.rbest.chr22.chain.gz hg19.equCab2.rbest.chr22.chain.gz hg19.canFam2.rbest.chr22.chain.gz hg19.loxAfr3.rbest.chr22.chain.gz -i narrowPeak > example.mapped.out
+
+# Expected results:
+chr22	16166487	16166757	46929	135	gain_hg19	.	-1	-1	-1
+chr22	17398307	17398657	46948	180	loss_mm9	.	-1	-1	-1
+chr22	17980731	17981081	46974	175	ortholog	chr6	120686592	120686750	148
+
+# See README.md in the root program directory for interpretation of results.
