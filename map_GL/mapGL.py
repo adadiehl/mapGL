@@ -26,7 +26,7 @@ from bx.align.epo import bed_union as elem_u
 from bx.cookbook import argparse
 from bx.intervals.intersection import IntervalTree, Interval
 
-__version__ = "0.0.2"
+__version__ = "0.0.3"
 
 elem_t = np.dtype([('chrom', np.str_, 30), ('start', np.int64), ('end', np.int64), ('id', np.str_, 100)])
 narrowPeak_t = np.dtype([('chrom', np.str_, 30), ('start', np.int64), ('end', np.int64), ('id', np.str_, 100),
@@ -143,7 +143,7 @@ def transform_by_chrom(all_epo, from_elem, tree, chrom, opt):
     elif len(to_elem_slices) > 1:
         log.debug("%s spans multiple chains/chromosomes. Using longest alignment." % (str(from_elem)))
         max_elem_len = 0
-        for i in xrange(len(to_elem_slices)):
+        for i in range(len(to_elem_slices)):
             elem_len = to_elem_slices[i][-1][2] - to_elem_slices[i][0][2]
             if elem_len > max_elem_len:
                 max_elem_len = elem_len

@@ -23,7 +23,7 @@ def main():
 
     metadata = dict(
         name="mapGL",
-        version="0.0.2",
+        version="0.0.3",
         author="Adam Diehl",
         author_email="adadiehl@umich.edu",
         description="Prediction of lineage-specific gain and loss of sequence elements using phylogenetic maximum parsimony.",
