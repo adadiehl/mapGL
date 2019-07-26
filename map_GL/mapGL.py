@@ -20,11 +20,13 @@ from operator import attrgetter, concat, itemgetter
 import numpy as np
 from six.moves import reduce
 
-import newick
+import map_GL.newick
 from bx.align import epo
 from bx.align.epo import bed_union as elem_u
 from bx.cookbook import argparse
 from bx.intervals.intersection import IntervalTree, Interval
+
+__version__ = "0.0.1"
 
 elem_t = np.dtype([('chrom', np.str_, 30), ('start', np.int64), ('end', np.int64), ('id', np.str_, 100)])
 narrowPeak_t = np.dtype([('chrom', np.str_, 30), ('start', np.int64), ('end', np.int64), ('id', np.str_, 100),
@@ -344,7 +346,7 @@ def loadFeatures(path, opt):
     return data
 
 
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser(description=__doc__, epilog="Adam Diehl (Boyle Lab)",
             formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
@@ -436,3 +438,7 @@ if __name__ == "__main__":
 
     # transform elements
     transform_file(loadFeatures( opt.input, opt ), opt.output, TREES, leaves, phylo_full, phylo_pruned, opt)
+
+    
+if __name__ == "__main__":
+    main()

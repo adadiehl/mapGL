@@ -31,7 +31,6 @@ def main():
         long_description_content_type="text/markdown",
         url="https://github.com/adadiehl/mapGL",
         packages = find_packages(),
-        scripts=glob("*.py", recursive=True),
         package_data = {
             'mapGL': [
                 "LICENSE",
@@ -41,17 +40,15 @@ def main():
         setup_requires=[
             'numpy>=1.16',
             'bx-python',
-            'cython'
         ],
         install_requires=[
             'numpy',
             'six',
             'bx-python',
-            'cython'
         ],
         entry_points={
             'console_scripts': [
-                'mapGL.py = mapGL:main'
+                'mapGL.py = map_GL.mapGL:main'
             ]
         },
         classifiers=[
