@@ -20,13 +20,13 @@ from operator import attrgetter, concat, itemgetter
 import numpy as np
 from six.moves import reduce
 
-import map_GL.newick
+from map_GL import newick
 from bx.align import epo
 from bx.align.epo import bed_union as elem_u
 from bx.cookbook import argparse
 from bx.intervals.intersection import IntervalTree, Interval
 
-__version__ = "0.0.1"
+__version__ = "0.0.2"
 
 elem_t = np.dtype([('chrom', np.str_, 30), ('start', np.int64), ('end', np.int64), ('id', np.str_, 100)])
 narrowPeak_t = np.dtype([('chrom', np.str_, 30), ('start', np.int64), ('end', np.int64), ('id', np.str_, 100),

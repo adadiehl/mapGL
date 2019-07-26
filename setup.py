@@ -23,7 +23,7 @@ def main():
 
     metadata = dict(
         name="mapGL",
-        version="0.0.1",
+        version="0.0.2",
         author="Adam Diehl",
         author_email="adadiehl@umich.edu",
         description="Prediction of lineage-specific gain and loss of sequence elements using phylogenetic maximum parsimony.",
@@ -38,13 +38,15 @@ def main():
             ]
         },
         setup_requires=[
-            'numpy>=1.16',
+            'numpy',
             'bx-python',
+            'six',
+            'cython'
         ],
         install_requires=[
             'numpy',
             'six',
-            'bx-python',
+            'bx-python',            
         ],
         entry_points={
             'console_scripts': [
