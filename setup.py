@@ -15,12 +15,13 @@ from setuptools import setup, find_packages
 from pathlib import Path
 from glob import glob
 
-let readme_f = 'README.md'
 if sys.version_info > (3, ):
-    readme_f = Path(__file__).parent.resolve() / 'README.md', encoding='utf-8'
-
+    readme_f = Path(__file__).parent.resolve() / 'README.md'
+else:
+    readme_f = 'README.md'
+    
 def readme():
-    with open(readme_f) as md:
+    with open(readme_f, encoding='utf-8') as md:
         return md.read()
 
 def main():
