@@ -1,7 +1,7 @@
 import sys
 
-if sys.version_info < (2, 6):
-    sys.exit("ERROR: mapGL requires Python 2.6 or greater")
+if sys.version_info < (2, 7):
+    sys.exit("ERROR: mapGL requires Python 2.7 or greater")
 elif sys.version_info > (3, ) and sys.version_info < (3, 3):
     sys.exit("ERROR: mapGL requires Python 3.3 or greater")
 
@@ -15,8 +15,12 @@ from setuptools import setup, find_packages
 from pathlib import Path
 from glob import glob
 
+readme_f = 'README.md'
+if sys.version_info > (3, ):
+    readme_f = Path(__file__).parent.resolve() / 'README.md', encoding='utf-8'
+
 def readme():
-    with open(str(Path(__file__).parent.resolve() / 'README.md', encoding='utf-8')) as md:
+    with open(readme_f) as md:
         return md.read()
 
 def main():
