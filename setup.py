@@ -15,7 +15,7 @@ from setuptools import setup, find_packages
 from pathlib import Path
 from glob import glob
 
-readme_f = 'README.md'
+let readme_f = 'README.md'
 if sys.version_info > (3, ):
     readme_f = Path(__file__).parent.resolve() / 'README.md', encoding='utf-8'
 
