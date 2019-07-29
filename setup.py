@@ -16,7 +16,7 @@ from pathlib import Path
 from glob import glob
 
 def readme():
-    with open(Path(__file__).parent.resolve() / 'README.md', encoding='utf-8') as md:
+    with open(str(Path(__file__).parent.resolve() / 'README.md', encoding='utf-8')) as md:
         return md.read()
 
 def main():
