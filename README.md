@@ -1,12 +1,12 @@
 [![PyPI version](https://badge.fury.io/py/mapGL.svg)](https://badge.fury.io/py/mapGL)
 [![Conda](https://img.shields.io/conda/v/bioconda/mapGL)](https://anaconda.org/bioconda/mapGL)
 [![GitHub](https://img.shields.io/github/license/adadiehl/mapGL)](https://github.com/adadiehl/mapGL/blob/master/LICENSE)
+<br/>
 
-
-|Host | Downloads |
-|:---_|:----------|
-|PyPI |[![Downloads](https://pepy.tech/badge/mapgl)](https://pepy.tech/project/mapgl)|
-|conda|[![Conda](https://img.shields.io/conda/dn/bioconda/mapGL)](https://anaconda.org/bioconda/mapGL)|
+ |Host | Downloads |
+ |:---_|:----------|
+ |PyPI |[![Downloads](https://pepy.tech/badge/mapgl)](https://pepy.tech/project/mapgl)|
+ |conda|[![Conda](https://img.shields.io/conda/dn/bioconda/mapGL)](https://anaconda.org/bioconda/mapGL)|
 
 
 # mapGL
