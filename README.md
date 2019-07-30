@@ -4,7 +4,7 @@
 <br/>
 
  |Host | Downloads |
- |:---_|:----------|
+ |-----|-----------|
  |PyPI |[![Downloads](https://pepy.tech/badge/mapgl)](https://pepy.tech/project/mapgl)|
  |conda|[![Conda](https://img.shields.io/conda/dn/bioconda/mapGL)](https://anaconda.org/bioconda/mapGL)|
 
