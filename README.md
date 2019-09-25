@@ -28,7 +28,8 @@ Based on bnMapper.py, by Ogert Denas (James Taylor lab):
 
 ## Dependencies
 numpy
-Cython
+bx-python
+cython
 six
 
 ## Usage
