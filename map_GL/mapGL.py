@@ -231,28 +231,60 @@ def transform_file(ELEMS, ofname, TREES, leaves, phylo_full, phylo_pruned, opt):
                         mapped_spp[spp] = 0
                 log.debug("Species mappings for elem {}: {}\n".format(elem, mapped_spp))
 
-                # Now do a post-order traversal of the tree, finding
-                # the most-likely lable at each ancestral node, down
+                # Do a post-order traversal of the tree, finding
+                # the most-likely label at each ancestral node, down
                 # to the root node.
-                in_mrca = infer_ancestral(phylo_full, mapped_spp)
-
-                orth_str = "ambiguous"
-                if in_mrca == 0:
-                    orth_str = "gain_{}".format(opt.qname)
-                elif in_mrca == 1:
-                    orth_str = "loss_{}".format(opt.tname)
-                elif in_mrca == "N":
-                    # If the full tree gives an ambiguous result, try the
-                    # pruned tree.
-                    in_mrca = infer_ancestral(phylo_pruned, mapped_spp)
-                    if in_mrca == 0:
-                        orth_str = "gain_{}".format(opt.qname)
-                    elif in_mrca == 1:
-                        orth_str = "loss_{}".format(opt.tname)
-
+                infer_ancestral(phylo_full, mapped_spp)
+                phylo = phylo_full
+                # If the labeling is ambiguous, repeat with the pruned
+                # tree.
+                if isinstance(phylo_full.get_label_at_root, list):
+                    infer_ancestral(phylo_pruned, mapped_spp)
+                    phylo = phylo_pruned
+                
+                if opt.full_labels:
+                    # Infer branch-wise gain/loss events.
+                    orth_str = get_events(phylo)
+                else:
+                    # Infer events only on target/query branches.
+                    orth_str = get_events_restricted(phylo, opt)
+                    
                 out_fd.write(OUT_FRM % (elem[0], elem[1], elem[2], elem[3], peak,
                                         orth_str, ".", -1, -1, -1))
     log.info("DONE!")
+
+
+def get_events_restricted(phylo, opt):
+    """
+    Infer gain/loss where events are restricted to target gain and query loss.
+    """
+    in_mrca = phylo.get_label_at_root()
+    orth_str = "ambiguous"
+    if in_mrca == 0:
+        orth_str = "gain_{}".format(opt.qname)
+    elif in_mrca == 1:
+        orth_str = "loss_{}".format(opt.tname)
+    return orth_str
+
+
+def get_events(phylo):
+    """
+    Infer gain/loss on individual branches of the tree.
+    """
+    phylo.disambiguate_labels()
+    events = []
+    event_nodes = phylo.get_event_nodes()
+    for name in event_nodes:
+        n = phylo.get_node(name)
+        if n.ancestor.label == 1:
+            # Element loss
+            events.extend(["loss_{}".format(name)])
+        else:
+            # Element gain
+            events.extend(["gain_{}".format(name)])
+    # Join the events into a single string
+    orth_str = ','.join(events)
+    return orth_str
 
 
 def map_elem(elem, EPO, TREE, opt):
@@ -283,9 +315,6 @@ def infer_ancestral(phylo, mapped_spp):
     phylo.visit(lambda n: n.infer_labels(),
                 lambda n: not n.is_leaf,
                 mode = "postorder")
-
-    # Return the label at the root    
-    return(phylo.get_label_at_root())
     
     
 def loadChains(path):
@@ -373,6 +402,8 @@ def main():
             help="If elements span multiple chains, report them as non-mapping. These will then be reported as gains or losses, according to the maximum-parsimony predictions. This is the default mapping behavior for bnMapper. By default, mapGL.pys will follow the mapping convention used by liftOver, whereas the longest mapped alignment is reported for split elements.")
     parser.add_argument("-i", "--in_format", choices=["BED", "narrowPeak"], default="BED",
             help="Input file format.")
+    parser.add_argument("-f", "--full_labels", default=False, action='store_true',
+            help="Label all branches with inferred gain/loss events in output. This will attempt to infer which branch(es) gain/loss events have occurred upon.")
 
     opt = parser.parse_args()
     log.setLevel(LOG_LEVELS[opt.verbose])

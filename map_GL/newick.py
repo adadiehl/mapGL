@@ -385,8 +385,8 @@ class Node(object):
         #sys.stderr.write("{}\n".format(child_labels))
         label = get_max_label(child_labels)
         # Set the label as the set of unique symbols observed at all
-        # children if no unambiguous call can be made, unless at root.
-        if label == "N" and self.ancestor:
+        # children if no unambiguous call can be made.
+        if label == "N":
             label = list(set((child_labels)))
         self.label = label
 
@@ -400,7 +400,51 @@ class Node(object):
             if n.ancestor:
                 continue
             return n.label
-            
+
+    def disambiguate_labels(self):
+        """
+        Added by Adam Diehl.
+
+        Perform a preorder traversal to disambiguate internal state
+        labels following a maximum parsimony assumption.
+        """
+        for n in self.walk(mode='preorder'):            
+            if not n.ancestor:
+                if isinstance(n.label, list):
+                    # Cannot disambiguate based on an ambiguously-
+                    # labeled root.
+                    sys.stderr.write("Cannot disambiguate a tree with an ambiguously-labeled root!")
+                    return False
+                continue
+            if not n.descendants:
+                # Leaf node
+                continue
+            if not isinstance(n.label, list):
+                # Unambiguous label
+                continue
+            parent_label = n.ancestor.label
+            labels = n.label
+            labels.extend([parent_label])
+            n.label = get_max_label(labels)            
+        return True
+
+    def get_event_nodes(self):
+        """
+        Added by Adam Diehl.
+
+        Get names of nodes where the node label does not match the
+        parent node label as nodes where an event has likely occurred
+        on the branch connecting to the parent. Returns a list.
+        """
+        events = []
+        for n in self.walk(mode='postorder'):
+            if not n.ancestor:
+                return events
+            if isinstance(n.label, list):
+                sys.stderr.write("get_event_branches should only be run on a disambiguated tree. Run tree.disambiguate_labels first.")
+                return False
+            if n.label != n.ancestor.label:
+                events.extend([n.name])
         
 def get_max_label(labels):
     """
