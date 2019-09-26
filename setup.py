@@ -44,8 +44,8 @@ def main():
         setup_requires=[
             'numpy',
             'bx-python',
-            'six',
-            'cython'
+            #'six',
+            #'cython'
         ],
         install_requires=[
             'numpy',
