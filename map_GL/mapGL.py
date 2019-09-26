@@ -401,9 +401,9 @@ def main():
     parser.add_argument("-d", '--drop_split', default=False, action='store_true',
             help="If elements span multiple chains, report them as non-mapping. These will then be reported as gains or losses, according to the maximum-parsimony predictions. This is the default mapping behavior for bnMapper. By default, mapGL.pys will follow the mapping convention used by liftOver, whereas the longest mapped alignment is reported for split elements.")
     parser.add_argument("-i", "--in_format", choices=["BED", "narrowPeak"], default="BED",
-            help="Input file format.")
+            help="Input file format. (Default: BED)")
     parser.add_argument("-f", "--full_labels", default=False, action='store_true',
-            help="Label all branches with inferred gain/loss events in output. This will attempt to infer which branch(es) gain/loss events have occurred upon.")
+                        help="Attempt to predict gain/loss events on all branches of the tree, not just query/target branches. Output will include a comma-delimited list of gain/loss events from any/all affected branches.")
 
     opt = parser.parse_args()
     log.setLevel(LOG_LEVELS[opt.verbose])
