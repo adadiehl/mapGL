@@ -15,6 +15,7 @@ Based on bnMapper.py, by Ogert Denas (James Taylor lab)
 import logging
 import os
 import sys
+import re
 from itertools import groupby
 from operator import attrgetter, concat, itemgetter
 import numpy as np
@@ -347,21 +348,135 @@ def loadFeatures(path, opt):
 
     log.info("loading from %s ..." % path)
     data = []
+    i = 1;
     if opt.in_format == "BED":
         with open(path) as fd:
             for line in fd:
                 cols = line.split()
-                data.append( (cols[0], int(cols[1]), int(cols[2]), cols[3]) )
+                if validateBedLine(cols, i):
+                    data.append( (cols[0], int(cols[1]), int(cols[2]), cols[3]) )
+                i += 1
         data = np.array(data, dtype=elem_t)
     else:
         with open(path) as fd:
             for line in fd:
                 cols = line.split()
-                data.append( (cols[0], int(cols[1]), int(cols[2]), cols[3], int(cols[4]),
-                              cols[5], float(cols[6]), float(cols[7]), float(cols[8]),
-                              int(cols[-1])+int(cols[1])) )
+                if validateNarrowPeakLine(cols, i):
+                    data.append( (cols[0], int(cols[1]), int(cols[2]), cols[3], int(cols[4]),
+                                  cols[5], float(cols[6]), float(cols[7]), float(cols[8]),
+                                  int(cols[-1])+int(cols[1])) )
+                i += 1
         data = np.array(data, dtype=narrowPeak_t)
     return data
+
+
+def validateBedLine(line, ln):
+    """
+    Validate that input matches the BED convention. Only the first four fields
+    are enforced (BED4 format).
+    """
+    if not (isinstance(line[0], str) and
+            re.match("^chr", line[0])):
+        sys.stderr.write("Input line {} does not match BED format: {} is not a valid chromosome name. Omitting this record!\n".format(ln, line[2]))
+        return False
+    
+    try:
+        int(line[1])
+    except ValueError:
+        sys.stderr.write("Input line {} does not match BED format: {} is not an integer. Omitting this record!\n".format(ln, line[1]))
+        return False
+
+    try:
+        int(line[2])
+    except ValueError:
+        sys.stderr.write("Input line {} does not match BED format: {} is not an integer. Omitting this record!\n".format(ln, line[2]))
+        return False        
+
+    if not isinstance(line[3], str):
+        sys.stderr.write("Input line {} does not match BED format: {} is not a valid name string. Omitting this record!\n".format(ln, line[2]))
+        return False
+
+    return True
+
+
+def validateNarrowPeakLine(line, ln):
+    """
+    Validate that input matches the narrowPeak convention.
+    """
+    if not (isinstance(line[0], str) and
+            re.match("^chr", line[0])):
+        sys.stderr.write("Input line {} does not match narrowPeak format. Column 1 (chrom): {} is not a valid chromosome name. Omitting this record!\n".format(ln, line[2]))
+        return False
+
+    try:
+        int(line[1])
+    except ValueError:
+        sys.stderr.write("Input line {} does not match narrowPeak format. Column 2 (chromStart): {} is not an integer. Omitting this record!\n".format(ln, line[1]))
+        return False
+
+    try:
+        int(line[2])
+    except ValueError:
+        sys.stderr.write("Input line {} does not match narrowPeak format. Column 3 (chromEnd): {} is not an integer. Omitting this record!\n".format(ln, line[2]))
+        return False
+
+    if int(line[1]) > int(line[2]):
+        sys.stderr.write("Input line {} does not match narrowPeak format. chromStart: {} is greater than chromEnd: {}. Omitting this record!\n".format(ln, line[1], line[2]))
+        return False
+
+    if not isinstance(line[3], str):
+        sys.stderr.write("Input line {} does not match narrowPeak format. Column 4 (name): {} is not a valid name string. Omitting this record!\n".format(ln, line[2]))
+        return False
+
+    if not line[4] == ".":
+        good = True
+        try:
+            val = int(line[4])
+            if val < 0 or val > 1000:
+                good = False
+        except ValueError:
+            good = False            
+        if not good:
+            sys.stderr.write("Input line {} does not match narrowPeak format. column 5 (score): {} is not an integer between 0-1000. Omitting this record!\n".format(ln, line[4]))
+            return False
+
+    if not (line[5] == "." or
+            line[5] == "+" or
+            line[5] == "-"):
+        sys.stderr.write("Input line {} does not match narrowPeak format. Column 6 (strand): {} is not one of [+, -, .]. Omitting this record!\n".format(ln, line[5]))
+        return False
+
+    try:
+        float(line[6])
+    except ValueError:
+        sys.stderr.write("Input line {} does not match narrowPeak format. column 7 (signalValue): {} is not a floating point number. Omitting this record!\n".format(ln, line[6]))
+        return False
+
+    try:
+        float(line[7])
+    except ValueError:
+        sys.stderr.write("Input line {} does not match narrowPeak format. column 8 (pValue): {} is not a floating point number. Omitting this record!\n".format(ln, line[7]))
+        return False
+
+    try:
+        float(line[8])
+    except ValueError:
+        sys.stderr.write("Input line {} does not match narrowPeak format. column 9 (qValue): {} is not a floating point number. Omitting this record!\n".format(ln, line[8]))
+        return False
+
+    try:
+        val = int(line[9])
+    except ValueError:
+        sys.stderr.write("Input line {} does not match narrowPeak format. column 10 (peak): {} is not an integer. Omitting this record!\n".format(ln, line[9]))
+        return False
+    
+    elLen = int(line[2]) - int(line[1])
+    if (val > elLen or val < -1):
+        sys.stderr.write("Input line {} does not match narrowPeak format. column 10 (peak): {} must be a value between -1 and {}. Omitting this record!\n".format(ln, line[9], elLen))
+        return False
+
+    return True
+
 
 
 def main():
