@@ -486,7 +486,7 @@ def main():
     parser.add_argument("input",
             help="Input regions to process. Should be in standard bed format. Only the first four bed fields will be used.")
     parser.add_argument("tree",
-            help="Tree, in standard Newick format, with or without branch lengths, describing relationships of query and target species to outgroups.")
+            help="Tree, in standard Newick format, with or without branch lengths, describing relationships of query and target species to outgroups. May be given as a string or file.")
     parser.add_argument("qname",
             help="Name of the query species. Regions from this species will be mapped to target species coordinates.")
     parser.add_argument("tname",
