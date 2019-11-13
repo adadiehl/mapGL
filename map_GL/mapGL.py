@@ -514,13 +514,21 @@ def main():
 
     # Load up the newick tree
     log.info("Parsing species tree: {}".format(opt.tree))
-    phylo_full = newick.parse_node(opt.tree)
-    log.debug("Full tree:\n{}".format(phylo_full.ascii_art(show_internal=False, strict=True)))
+    if os.path.isfile(opt.tree):
+        phylo_full = newick.read(opt.tree)[0]
+    else:
+        phylo_full = newick.parse_node(opt.tree)
+    log.debug("Full tree:\n{}".format(phylo_full.ascii_art(show_internal=False, strict=True)))    
 
     # Prune the terminal outgroup (furthest from the query species)
     # to use in ambiguous cases. For now, this is assumed to be the
     # last species in the leaves list.
-    phylo_pruned = newick.parse_node(opt.tree)
+    ## TO-DO: newick.py lacks a copy function. Would be nice to just
+    ## do a deep copy here instead of reloading from string/file.
+    if os.path.isfile(opt.tree):        
+        phylo_pruned = newick.read(opt.tree)[0]
+    else:
+        phylo_pruned = newick.parse_node(opt.tree)
     leaves = phylo_pruned.get_leaves()
     leaves[-1].ancestor.descendants.remove(leaves[-1])
     phylo_pruned = newick.parse_node(leaves[-1].ancestor.newick)
@@ -529,10 +537,10 @@ def main():
     leaves = phylo_full.get_leaf_names()
     
     if opt.qname not in leaves:
-        sys.stderr.write("Query species name {} not present in tree: {}\n".format(opt.qname, phylo_full.newick))
+        sys.stderr.write("Query species name {} not present in tree: {}. Exiting.\n".format(opt.qname, phylo_full.newick))
         exit(1)
     if opt.tname not in leaves:
-        sys.stderr.write("Target species name {} not present in tree: {}\n".format(opt.tname, phylo_full.newick))
+        sys.stderr.write("Target species name {} not present in tree: {}. Exiting.\n".format(opt.tname, phylo_full.newick))
         exit(1)
 
     # Load up alignment chains. Need reciprocal-best chains for the pair
@@ -546,10 +554,10 @@ def main():
         cname_parts = chain.split("/")
         cname_parts = cname_parts[-1].split(".")
         if cname_parts[0] != opt.qname:
-            sys.stderr.write("Chain {} does not appear to contain the correct query species!\n".format(chain))
+            sys.stderr.write("Chain {} does not appear to contain the correct query species. Exiting.\n".format(chain))
             exit(1)
         if cname_parts[1] not in leaves:
-            sys.stderr.write("Chain {} target species not present in tree {}\n".format(chain, phylo_full.newick))
+            sys.stderr.write("Chain {} target species not present in tree {}. Exiting.\n".format(chain, phylo_full.newick))
             exit(1)
             
         #loading alignments from the chain/pkl file
