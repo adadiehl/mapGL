@@ -339,17 +339,6 @@ def loadChains(path):
     assert all( t[0].tStrand == '+' for t in EPO ), "all target strands should be +"
     return EPO
 
-def loadFeatures(path):
-    "load bed4 features (all other columns are ignored)"
-
-    log.info("loading from %s ..." % path)
-    data = []
-    with open(path) as fd:
-        for line in fd:
-            cols = line.split()
-            data.append( (cols[0], int(cols[1]), int(cols[2]), cols[3]) )
-    return np.array(data, dtype=elem_t)
-
 def loadFeatures(path, opt):
     """
     Load features. For BED, only BED4 columns are loaded.
@@ -392,10 +381,10 @@ def main():
     parser.add_argument("-o", '--output', metavar="FILE", default='stdout',
             type=lambda s: ((s in ('stdout', '-') and "/dev/stdout") or s),
             help="Output file. Default stdout.")
-    parser.add_argument("-t", '--threshold', metavar="FLOAT", default=0., type=float,
-            help="Mapping threshold i.e., |elem| * threshold <= |mapped_elem|")
+    parser.add_argument("-t", '--threshold', metavar="FLOAT", default=0.0, type=float,
+            help="Mapping threshold i.e., |elem| * threshold <= |mapped_elem|. Default = 0.0 -- equivalent to accepting a single-base overlap. On the other end of the spectrum, setting this value to 1 is equivalent to only accepting full-length overlaps.")
     parser.add_argument('-g', '--gap', type=int, default=-1,
-            help="Ignore elements with an insertion/deletion of this or bigger size.")
+            help="Ignore elements with an insertion/deletion of this or bigger size. Using the default value (-1) will allow gaps of any size.")
     parser.add_argument('-v', '--verbose', type=str, choices=list(LOG_LEVELS.keys()), default='info',
             help='Verbosity level')
     parser.add_argument("-d", '--drop_split', default=False, action='store_true',
@@ -403,7 +392,7 @@ def main():
     parser.add_argument("-i", "--in_format", choices=["BED", "narrowPeak"], default="BED",
             help="Input file format. (Default: BED)")
     parser.add_argument("-f", "--full_labels", default=False, action='store_true',
-                        help="Attempt to predict gain/loss events on all branches of the tree, not just query/target branches. Output will include a comma-delimited list of gain/loss events from any/all affected branches.")
+            help="Attempt to predict gain/loss events on all branches of the tree, not just query/target branches. Output will include a comma-delimited list of gain/loss events from any/all affected branches.")
 
     opt = parser.parse_args()
     log.setLevel(LOG_LEVELS[opt.verbose])
