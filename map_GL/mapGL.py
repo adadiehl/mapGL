@@ -330,7 +330,11 @@ def infer_ancestral(phylo, mapped_spp):
 def loadChains(path):
     "name says it."
 
-    EPO = epo.Chain._parse_file(path, True)
+    try:
+        EPO = epo.Chain._parse_file(path, True)
+    except:
+        sys.stderr.write("ERROR: {} does not appear to be a valid chain file. Exiting!\n".format(path))
+        exit(1)
     ## convert coordinates w.r.t the forward strand (into slices)
     ## compute cummulative intervals
     for i in range( len(EPO) ):
