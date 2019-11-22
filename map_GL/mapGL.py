@@ -69,6 +69,15 @@ class GIntervalTree( IntervalTree ):
         #return always a list
         return []
 
+    def chromExists(self, chrom):
+        """Check the chain for the given chromosome. Used for input validation."""
+        tree = self._trees.get( chrom, None )
+        if tree:
+            return True
+        else:
+            return False
+        
+
 def transform(elem, chain_CT_CQ, max_gap):
     """transform the coordinates of this elem into the other species.
 
@@ -207,10 +216,10 @@ def transform_file(ELEMS, ofname, TREES, leaves, phylo_full, phylo_pruned, opt):
             peak = int((elem[2] - elem[1])/2)
             if opt.in_format == "narrowPeak":
                 peak =  elem[9] - elem[1]
-            
+
             # First try mapping to the target species.
             mapped_el = map_elem(elem, TREES[opt.tname]["EPO"],
-                                 TREES[opt.tname]["TREE"], opt)
+                                 TREES[opt.tname]["TREE"], opt)            
 
             if mapped_el:
                 #sys.stderr.write("{}\n".format(mapped_el))
@@ -340,7 +349,7 @@ def loadChains(path):
     assert all( t[0].tStrand == '+' for t in EPO ), "all target strands should be +"
     return EPO
 
-def loadFeatures(path, opt):
+def loadFeatures(path, opt, TREE):
     """
     Load features. For BED, only BED4 columns are loaded.
     For narrowPeak, all columns are loaded.
@@ -353,7 +362,7 @@ def loadFeatures(path, opt):
         with open(path) as fd:
             for line in fd:
                 cols = line.split()
-                if validateBedLine(cols, i):
+                if validateBedLine(cols, i, TREE):
                     data.append( (cols[0], int(cols[1]), int(cols[2]), cols[3]) )
                 i += 1
         data = np.array(data, dtype=elem_t)
@@ -361,7 +370,7 @@ def loadFeatures(path, opt):
         with open(path) as fd:
             for line in fd:
                 cols = line.split()
-                if validateNarrowPeakLine(cols, i):
+                if validateNarrowPeakLine(cols, i, TREE):
                     data.append( (cols[0], int(cols[1]), int(cols[2]), cols[3], int(cols[4]),
                                   cols[5], float(cols[6]), float(cols[7]), float(cols[8]),
                                   int(cols[-1])+int(cols[1])) )
@@ -370,14 +379,18 @@ def loadFeatures(path, opt):
     return data
 
 
-def validateBedLine(line, ln):
+def validateBedLine(line, ln, TREE):
     """
     Validate that input matches the BED convention. Only the first four fields
     are enforced (BED4 format).
     """
     if not (isinstance(line[0], str) and
             re.match("^chr", line[0])):
-        sys.stderr.write("Input line {} does not match BED format: {} is not a valid chromosome name. Omitting this record!\n".format(ln, line[2]))
+        sys.stderr.write("Input line {} does not match BED format: {} is not a valid chromosome name. Omitting this record!\n".format(ln, line[0]))
+        return False
+
+    if not TREE.chromExists(line[0]):
+        sys.stderr.write("Input line {}: Chromosome {} not found in query chains. Omitting this record!\n".format(ln, line[0]))
         return False
     
     try:
@@ -399,13 +412,17 @@ def validateBedLine(line, ln):
     return True
 
 
-def validateNarrowPeakLine(line, ln):
+def validateNarrowPeakLine(line, ln, TREE):
     """
     Validate that input matches the narrowPeak convention.
     """
     if not (isinstance(line[0], str) and
             re.match("^chr", line[0])):
-        sys.stderr.write("Input line {} does not match narrowPeak format. Column 1 (chrom): {} is not a valid chromosome name. Omitting this record!\n".format(ln, line[2]))
+        sys.stderr.write("Input line {} does not match narrowPeak format. Column 1 (chrom): {} is not a valid chromosome name. Omitting this record!\n".format(ln, line[0]))
+        return False
+
+    if not TREE.chromExists(line[0]):
+        sys.stderr.write("Input line {}: Chromosome {} not found in query chains. Omitting this record!\n".format(ln, line[0]))
         return False
 
     try:
@@ -518,7 +535,7 @@ def main():
         phylo_full = newick.read(opt.tree)[0]
     else:
         phylo_full = newick.parse_node(opt.tree)
-    log.debug("Full tree:\n{}".format(phylo_full.ascii_art(show_internal=False, strict=True)))    
+    log.debug("Full tree:\n{}".format(phylo_full.ascii_art(show_internal=False, strict=True)))
 
     # Prune the terminal outgroup (furthest from the query species)
     # to use in ambiguous cases. For now, this is assumed to be the
@@ -580,7 +597,7 @@ def main():
         exit(1)
 
     # transform elements
-    transform_file(loadFeatures( opt.input, opt ), opt.output, TREES, leaves, phylo_full, phylo_pruned, opt)
+    transform_file(loadFeatures( opt.input, opt, TREES[opt.tname]["TREE"]), opt.output, TREES, leaves, phylo_full, phylo_pruned, opt)
 
     
 if __name__ == "__main__":
