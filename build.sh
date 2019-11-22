@@ -4,10 +4,10 @@
 # argument to indicate whether this is a major, minor, or patch release.
 
 # Increment version numbers
-NV=$(bump2version --dry-run --list $1 | grep new_version | sed -r s,"^.*=",,)
+bump2version --list $1
 
 # Update PyPI
 python3 setup.py sdist bdist_wheel
-python3 -m twine upload dist/mapGL-$NV*
+python3 -m twine upload dist/mapGL-$(cat VERSION)*
 
 # Update BioConda
