@@ -248,12 +248,13 @@ def transform_file(ELEMS, ofname, TREES, leaves, phylo_full, phylo_pruned, opt):
                 phylo = phylo_full
                 # If the labeling is ambiguous, repeat with the pruned
                 # tree.
-                if isinstance(phylo_full.get_label_at_root, list):
+                if isinstance(phylo_full.get_label_at_root(), list) and not opt.no_prune and not opt.full_labels:
                     infer_ancestral(phylo_pruned, mapped_spp)
                     phylo = phylo_pruned
                 
                 if opt.full_labels:
                     # Infer branch-wise gain/loss events.
+                    phylo.disambiguate_root()
                     orth_str = get_events(phylo)
                 else:
                     # Infer events only on target/query branches.
@@ -269,12 +270,14 @@ def get_events_restricted(phylo, opt):
     Infer gain/loss where events are restricted to target gain and query loss.
     """
     in_mrca = phylo.get_label_at_root()
-    orth_str = "ambiguous"
-    if in_mrca == 0:
-        orth_str = "gain_{}".format(opt.qname)
+    if isinstance(in_mrca, list):
+        return "ambiguous"
+    elif in_mrca == 0:
+        return "gain_{}".format(opt.qname)
     elif in_mrca == 1:
-        orth_str = "loss_{}".format(opt.tname)
-    return orth_str
+        return "loss_{}".format(opt.tname)
+    log.debug("Undefined symbol at root: {}".format(in_mrca))
+    return "unknown"
 
 
 def get_events(phylo):
@@ -529,6 +532,8 @@ def main():
             help="Input file format. (Default: BED)")
     parser.add_argument("-f", "--full_labels", default=False, action='store_true',
             help="Attempt to predict gain/loss events on all branches of the tree, not just query/target branches. Output will include a comma-delimited list of gain/loss events from any/all affected branches.")
+    parser.add_argument("-n", "--no_prune", default=False, action='store_true',
+            help="Do not use pruned tree to resolve ambiguous gain/loss predictions. Instead, these will be labelled 'ambiguous'.")
 
     opt = parser.parse_args()
     log.setLevel(LOG_LEVELS[opt.verbose])
@@ -539,6 +544,8 @@ def main():
         phylo_full = newick.read(opt.tree)[0]
     else:
         phylo_full = newick.parse_node(opt.tree)
+    if opt.full_labels:
+        phylo_full.name_internal_nodes()
     log.debug("Full tree:\n{}".format(phylo_full.ascii_art(show_internal=False, strict=True)))
 
     # Prune the terminal outgroup (furthest from the query species)
@@ -546,17 +553,22 @@ def main():
     # last species in the leaves list.
     ## TO-DO: newick.py lacks a copy function. Would be nice to just
     ## do a deep copy here instead of reloading from string/file.
-    if os.path.isfile(opt.tree):        
-        phylo_pruned = newick.read(opt.tree)[0]
-    else:
-        phylo_pruned = newick.parse_node(opt.tree)
-    leaves = phylo_pruned.get_leaves()
-    leaves[-1].ancestor.descendants.remove(leaves[-1])
-    phylo_pruned = newick.parse_node(leaves[-1].ancestor.newick)
-    phylo_pruned.remove_redundant_nodes()
-    log.debug("Pruned tree:\n{}".format(phylo_pruned.ascii_art(show_internal=False, strict=True)))
+    phylo_pruned = {}
+    if not opt.no_prune:
+        if os.path.isfile(opt.tree):
+            phylo_pruned = newick.read(opt.tree)[0]
+        else:
+            phylo_pruned = newick.parse_node(opt.tree)
+        leaves = phylo_pruned.get_leaves()
+        leaves[-1].ancestor.descendants.remove(leaves[-1])
+        phylo_pruned = newick.parse_node(leaves[-1].ancestor.newick)
+        phylo_pruned.remove_redundant_nodes()
+        if opt.full_labels:
+            phylo_pruned.name_internal_nodes()
+        log.debug("Pruned tree:\n{}".format(phylo_pruned.ascii_art(show_internal=False, strict=True)))
+
+    # Make sure target and query species are in the tree
     leaves = phylo_full.get_leaf_names()
-    
     if opt.qname not in leaves:
         sys.stderr.write("Query species name {} not present in tree: {}. Exiting.\n".format(opt.qname, phylo_full.newick))
         exit(1)
