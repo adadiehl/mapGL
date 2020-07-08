@@ -362,6 +362,14 @@ class Node(object):
     def print_name(self):
         print(self.name)
 
+    def name_internal_nodes(self):
+        """
+        Added by Adam Diehl.
+        Add names to internal nodes. Uses the left and right terminal
+        leaf nodes of a subtree to build the internal node name.
+        """
+        self.visit(lambda n: setattr(n, 'name', build_internal_node_name(n)), lambda n: not n.is_leaf)
+        
     def infer_labels(self):
         """
         Added by Adam Diehl to enable ancestral state inference based on
@@ -413,7 +421,7 @@ class Node(object):
                 if isinstance(n.label, list):
                     # Cannot disambiguate based on an ambiguously-
                     # labeled root.
-                    sys.stderr.write("Cannot disambiguate a tree with an ambiguously-labeled root!")
+                    sys.stderr.write("Cannot disambiguate a tree with an ambiguously-labeled root!\n")
                     return False
                 continue
             if not n.descendants:
@@ -428,6 +436,36 @@ class Node(object):
             n.label = get_max_label(labels)            
         return True
 
+    def disambiguate_root(self):
+        """
+        Added by Adam Diehl
+        Disambiguate the label at the root of the tree by
+        choosing the label for the (unambiguous) child with the
+        most support, vis-a-vis the greatest number of descendants.
+        Always chooses left subtree if bother are of equal length.
+        """
+        if not isinstance(self.label, list):
+            # Nothing to do
+            return False
+        if not self.descendants:
+            # Leaf node. Nothing to do.
+            return False
+        if self.ancestor:
+            # Non-Root node.
+            sys.stderr.write("Non-root node given. Will not disambiguate internal node.\n")
+            return False
+        l_left = len(self.descendants[0].get_leaf_names())
+        l_right = len(self.descendants[1].get_leaf_names())
+        if l_left >= l_right and not isinstance(self.descendants[0], list):
+            n = self.descendants[0]
+        else:
+            n = self.descendants[1]
+        if isinstance(n.label, list):
+            sys.stderr.write("Cannot disambiguate root based on ambiguous descendants.\n")
+            return False
+        setattr(self, 'label', n.label)
+        return True
+    
     def get_event_nodes(self):
         """
         Added by Adam Diehl.
@@ -441,7 +479,7 @@ class Node(object):
             if not n.ancestor:
                 return events
             if isinstance(n.label, list):
-                sys.stderr.write("get_event_branches should only be run on a disambiguated tree. Run tree.disambiguate_labels first.")
+                sys.stderr.write("get_event_branches should only be run on a disambiguated tree. Run tree.disambiguate_labels first.\n")
                 return False
             if n.label != n.ancestor.label:
                 events.extend([n.name])
@@ -581,3 +619,11 @@ def parse_node(s, strip_comments=False, **kw):
     return Node.create(name=name, length=length, descendants=descendants, **kw)
 
 
+def build_internal_node_name(n):
+    """
+    Added by Adam Diehl.
+    Build a node name for an internal node by concatenating
+    the left and right terminal leaf node names.
+    """
+    leaves = n.get_leaf_names()
+    return "-".join([leaves[0], leaves[-1]])
