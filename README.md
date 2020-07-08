@@ -58,7 +58,7 @@ six
   | __-d, --drop_split__ | Follow the bnMapper convention of silently dropping elements that span multiple chains, rather than the liftOver mapping convention for split alignments: keep elements that span multiple chains and report the longest aligned segment. This is not recommended, as it may lead to spurious gain/loss predictions for orthologous elements that happen to be split across chains due to chromosomal rearrangements, etc... (default: False) |
   | __-i {BED,narrowPeak}, --in_format__ {BED,narrowPeak} | Input file format. (default: BED) |
   | __-f, --full_labels__ | Predict gain/loss events on the whole tree, not just branches leading to query and target species. (default: False) |
-
+  | __-n, --no_prune__ | Do not use pruned tree to resolve ambiguous gain/loss predictions. Instead, these will be labelled 'ambiguous'. (default: False) |
 ## Output
 
 Predictions are reported in tab-delimited format with the first four columns following the BED4 convention. The predicted evolutionary history (i.e., ortholog, gain in query, or loss in target) is reported in the "status" column. The final three columns contain the mapped location, in target coordinates, of mapped (ortholog) elements.
@@ -70,7 +70,7 @@ Predictions are reported in tab-delimited format with the first four columns fol
 | __end__ | End position on query chromosome. |
 | __name__ | Element name or ID. |
 | __peak__ | Peak location (narrowPeak input) or element midpoint (BED input) |
-| __status__ | Predicted phylogenetic history: __ortholog__, __gain_qname__, or __loss_tname__. If __--full_labels__ is used, this may include additional loss/gain events on other branches, in a comma-delimited list format. |
+| __status__ | Predicted phylogenetic history: __ortholog__, __gain_qname__, __loss_tname__, or __ambiguous__, if --no_prune is used. If __--full_labels__ is used, this may include additional loss/gain events on other branches, in a comma-delimited list format. |
 | __mapped chrom__ | For mapped (ortholog) elements, the chromosome on which the mapped element is located, in target coordinates. |
 | __mapped start__ | For mapped (ortholog) elements, the start position on the target chromosome on which the mapped element is located. |
 | __mapped end__ | For mapped (ortholog) elements, the end position on the target chromosome on which the mapped element is located. |
