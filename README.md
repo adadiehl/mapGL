@@ -59,7 +59,7 @@ six
   | __-i {BED,narrowPeak}, --in_format__ {BED,narrowPeak} | Input file format. (default: BED) |
   | __-f, --full_labels__ | Predict gain/loss events on the whole tree, not just branches leading to query and target species. (default: False) |
   | __-n, --no_prune__ | Do not attempt to disambiguate the root state to resolve ambiguous gain/loss predictions. Instead, label affected features as 'ambiguous'. (default: False) |
-  | __-p, --priority {gain,loss}__ | When resolving ambiguous trees, prioritize sequence gain or sequence loss. This can be thought of as assigning a lower cost to sequence insertions relative to deletions, or vice-versa. When priority='gain', ambiguity is resolved by assigning 0 state to the root node, such that sequence presence on a descendant branch will be interpreted as a gain. When priority='loss', ambiguity is resolved by asssigning state 1 to the root node, such that sequence absence in a descendant node is interpreted as a sequence loss. Default=gain (default: gain) |
+  | __-p, --priority {gain,loss}__ | When resolving ambiguous trees, prioritize sequence gain or sequence loss. This can be thought of as assigning a lower cost to sequence insertions relative to deletions, or vice-versa. When priority='gain', ambiguity is resolved by assigning 0 state to the root node, such that sequence presence on a descendant branch will be interpreted as a gain. When priority='loss', ambiguity is resolved by asssigning state 1 to the root node, such that sequence absence in a descendant node is interpreted as a sequence loss. (default: gain) |
 
 ## Output
 
