@@ -52,13 +52,15 @@ six
   |---|---|
   | __-h, --help__ | Show help message and exit. |
   | __-o FILE, --output FILE__ | Output file. (default: stdout) |
-  | __-t FLOAT, --threshold FLOAT__ | Mapping threshold i.e., |elem| * threshold <= |mapped_elem|. Default = 0.0 -- equivalent to accepting a single-base overlap. On the other end of the spectrum, setting this value to 1 is equivalent to only accepting full-length overlaps. (default: 0.0) |
+  | __-t FLOAT, --threshold FLOAT__ | Mapping threshold i.e., \|elem\| * threshold <= \|mapped_elem\|. Default = 0.0 -- equivalent to accepting a single-base overlap. On the other end of the spectrum, setting this value to 1 is equivalent to only accepting full-length overlaps. (default: 0.0) |
   | __-g GAP, --gap GAP__ | Ignore elements with an insertion/deletion of this or bigger size. Ignore elements with an insertion/deletion of this or bigger size. Using the default value (-1) will allow gaps of any size. (default: -1) |
   | __-v {info,debug,silent}, --verbose {info,debug,silent}__ | Verbosity level (default: info) |
   | __-d, --drop_split__ | Follow the bnMapper convention of silently dropping elements that span multiple chains, rather than the liftOver mapping convention for split alignments: keep elements that span multiple chains and report the longest aligned segment. This is not recommended, as it may lead to spurious gain/loss predictions for orthologous elements that happen to be split across chains due to chromosomal rearrangements, etc... (default: False) |
   | __-i {BED,narrowPeak}, --in_format__ {BED,narrowPeak} | Input file format. (default: BED) |
   | __-f, --full_labels__ | Predict gain/loss events on the whole tree, not just branches leading to query and target species. (default: False) |
-  | __-n, --no_prune__ | Do not use pruned tree to resolve ambiguous gain/loss predictions. Instead, these will be labelled 'ambiguous'. (default: False) |
+  | __-n, --no_prune__ | Do not attempt to disambiguate the root state to resolve ambiguous gain/loss predictions. Instead, label affected features as 'ambiguous'. (default: False) |
+  | __-p, --priority {gain,loss}__ | When resolving ambiguous trees, prioritize sequence gain or sequence loss. This can be thought of as assigning a lower cost to sequence insertions relative to deletions, or vice-versa. When priority='gain', ambiguity is resolved by assigning 0 state to the root node, such that sequence presence on a descendant branch will be interpreted as a gain. When priority='loss', ambiguity is resolved by asssigning state 1 to the root node, such that sequence absence in a descendant node is interpreted as a sequence loss. Default=gain (default: gain) |
+
 ## Output
 
 Predictions are reported in tab-delimited format with the first four columns following the BED4 convention. The predicted evolutionary history (i.e., ortholog, gain in query, or loss in target) is reported in the "status" column. The final three columns contain the mapped location, in target coordinates, of mapped (ortholog) elements.
