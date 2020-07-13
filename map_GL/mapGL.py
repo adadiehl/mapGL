@@ -249,12 +249,13 @@ def transform_file(ELEMS, ofname, TREES, leaves, phylo_full, phylo_pruned, opt):
                 # If the labeling is ambiguous, repeat with the pruned
                 # tree.
                 if isinstance(phylo_full.get_label_at_root(), list) and not opt.no_prune and not opt.full_labels:
-                    infer_ancestral(phylo_pruned, mapped_spp)
-                    phylo = phylo_pruned
+                    #infer_ancestral(phylo_pruned, mapped_spp)
+                    #phylo = phylo_pruned
+                    phylo.disambiguate_root(opt)
                 
                 if opt.full_labels:
                     # Infer branch-wise gain/loss events.
-                    phylo.disambiguate_root()
+                    phylo.disambiguate_root(opt)
                     orth_str = get_events(phylo)
                 else:
                     # Infer events only on target/query branches.
@@ -533,10 +534,16 @@ def main():
     parser.add_argument("-f", "--full_labels", default=False, action='store_true',
             help="Attempt to predict gain/loss events on all branches of the tree, not just query/target branches. Output will include a comma-delimited list of gain/loss events from any/all affected branches.")
     parser.add_argument("-n", "--no_prune", default=False, action='store_true',
-            help="Do not use pruned tree to resolve ambiguous gain/loss predictions. Instead, these will be labelled 'ambiguous'.")
+            help="Do not attempt to disambiguate the root state to resolve ambiguous gain/loss predictions. Instead, label affected features as 'ambiguous'.")
+    parser.add_argument("-p", "--priority", type=str, choices=list(["gain", "loss"]), default="gain",
+            help="When resolving ambiguous trees, prioritize sequence gain or sequence loss. This can be thought of as assigning a lower cost to sequence insertions relative to deletions, or vice-versa. When priority='gain', ambiguity is resolved by assigning 0 state to the root node, such that sequence presence on a descendant branch will be interpreted as a gain. When priority='loss', ambiguity is resolved by asssigning state 1 to the root node, such that sequence absence in a descendant node is interpreted as a sequence loss. Default=gain")
 
     opt = parser.parse_args()
     log.setLevel(LOG_LEVELS[opt.verbose])
+
+    # Sanity checks and warnings for odd usages:
+    if opt.no_prune and opt.full_labels:
+        sys.stderr.write("WARNING: --full_labels requires an unambiguous tree. --no_prune will be ignored.\n")
 
     # Load up the newick tree
     log.info("Parsing species tree: {}".format(opt.tree))
@@ -548,6 +555,7 @@ def main():
         phylo_full.name_internal_nodes()
     log.debug("Full tree:\n{}".format(phylo_full.ascii_art(show_internal=False, strict=True)))
 
+    """
     # Prune the terminal outgroup (furthest from the query species)
     # to use in ambiguous cases. For now, this is assumed to be the
     # last species in the leaves list.
@@ -566,7 +574,9 @@ def main():
         if opt.full_labels:
             phylo_pruned.name_internal_nodes()
         log.debug("Pruned tree:\n{}".format(phylo_pruned.ascii_art(show_internal=False, strict=True)))
-
+    """
+    phylo_pruned = {}
+    
     # Make sure target and query species are in the tree
     leaves = phylo_full.get_leaf_names()
     if opt.qname not in leaves:

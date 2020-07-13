@@ -436,7 +436,7 @@ class Node(object):
             n.label = get_max_label(labels)            
         return True
 
-    def disambiguate_root(self):
+    def disambiguate_root(self, opt):
         """
         Added by Adam Diehl
         Disambiguate the label at the root of the tree by
@@ -444,6 +444,7 @@ class Node(object):
         most support, vis-a-vis the greatest number of descendants.
         Always chooses left subtree if bother are of equal length.
         """
+        #sys.stderr.write("{}\n".format(self.label))
         if not isinstance(self.label, list):
             # Nothing to do
             return False
@@ -454,6 +455,8 @@ class Node(object):
             # Non-Root node.
             sys.stderr.write("Non-root node given. Will not disambiguate internal node.\n")
             return False
+        #sys.stderr.write("{}: {}\n".format(self.descendants[0].name, self.descendants[0].label))
+        #sys.stderr.write("{}: {}\n".format(self.descendants[1].name, self.descendants[1].label))
         l_left = len(self.descendants[0].get_leaf_names())
         l_right = len(self.descendants[1].get_leaf_names())
         if l_left >= l_right and not isinstance(self.descendants[0], list):
@@ -461,9 +464,15 @@ class Node(object):
         else:
             n = self.descendants[1]
         if isinstance(n.label, list):
-            sys.stderr.write("Cannot disambiguate root based on ambiguous descendants.\n")
-            return False
-        setattr(self, 'label', n.label)
+            # Ambiguous tree. Disambiguate by choosing a root
+            # label prioritizing gain or loss based on options
+            # given.
+            if opt.priority == "gain":
+                setattr(self, 'label', 0)
+            elif opt.priority == "loss":
+                setattr(self, 'label', 1)
+        else:
+            setattr(self, 'label', n.label)
         return True
     
     def get_event_nodes(self):
