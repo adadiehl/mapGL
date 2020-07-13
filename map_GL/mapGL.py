@@ -541,10 +541,6 @@ def main():
     opt = parser.parse_args()
     log.setLevel(LOG_LEVELS[opt.verbose])
 
-    # Sanity checks and warnings for odd usages:
-    if opt.no_prune and opt.full_labels:
-        sys.stderr.write("WARNING: --full_labels requires an unambiguous tree. --no_prune will be ignored.\n")
-
     # Load up the newick tree
     log.info("Parsing species tree: {}".format(opt.tree))
     if os.path.isfile(opt.tree):
@@ -586,6 +582,14 @@ def main():
         sys.stderr.write("Target species name {} not present in tree: {}. Exiting.\n".format(opt.tname, phylo_full.newick))
         exit(1)
 
+    # Sanity checks and warnings for odd usages:
+    if opt.no_prune and opt.full_labels:
+        sys.stderr.write("WARNING: --full_labels requires an unambiguous tree. --no_prune will be ignored.\n")
+    if len(leaves) < 4:
+        # Single-outgroup phylogeny
+        sys.stderr.write("WARNING: Tree-disambiguation requires at least two outgroup species. Forcing --no_prune.\n")
+        opt.no_prune = True
+        
     # Load up alignment chains. Need reciprocal-best chains for the pair
     # of species to be compared, and for three outgroup species. (Four
     # chains in all). TREES is a dictionary, keyed according to the
