@@ -459,11 +459,17 @@ class Node(object):
         #sys.stderr.write("{}: {}\n".format(self.descendants[1].name, self.descendants[1].label))
         l_left = len(self.descendants[0].get_leaf_names())
         l_right = len(self.descendants[1].get_leaf_names())
-        if l_left >= l_right and not isinstance(self.descendants[0], list):
-            n = self.descendants[0]
+        if l_left >= l_right:
+            if not isinstance(self.descendants[0], list):
+                n = self.descendants[0]
+            else:
+                n = self.descendants[1]
         else:
-            n = self.descendants[1]
-        if isinstance(n.label, list):
+            if not isinstance(self.descendants[1], list):
+                n = self.descendants[1]
+            else:
+                n = self.descendants[0]
+        if isinstance(n.label, list) or n.name in self.get_leaf_names():
             # Ambiguous tree. Disambiguate by choosing a root
             # label prioritizing gain or loss based on options
             # given.
