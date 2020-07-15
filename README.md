@@ -57,7 +57,9 @@ Installation from the github repository is not recommended. However, if you must
 
 ## Usage
 
-```mapGL.py [-h] [-o FILE] [-t FLOAT] [-g GAP] [-v {info,debug,silent}] [-k] input tree qname tname alignments [alignments ...] ```
+```
+mapGL.py [-h] [-o FILE] [-t FLOAT] [-g GAP] [-v {info,debug,silent}] [-k] input tree qname tname alignments [alignments ...]
+```
 
 ## Required Arguments
 
