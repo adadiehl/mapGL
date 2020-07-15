@@ -35,14 +35,20 @@ six
 ## Installation
 
 We recommend installing with conda, into a new environment:
-```conda create -n mapGL --channel conda-forge --channel bioconda python=3.7 numpy bx-python cython six mapGL
-conda activate mapGL```
+```
+conda create -n mapGL --channel conda-forge --channel bioconda python=3.7 numpy bx-python cython six mapGL
+conda activate mapGL
+```
 
 To install within an existing conda environment:
-```conda install -c bioconda mapgl```
+```
+conda install -c bioconda mapgl
+```
 
 Install with pip:
-```pip install mapGL```
+```
+pip install mapGL
+```
 
 Installation from the github repository is not recommended. However, if you must, follow the steps below:
 1) Install all dependencies listed above
